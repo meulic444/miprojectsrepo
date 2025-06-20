@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeleMed - Healthcare at Your Fingertips</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-heartbeat text-2xl text-blue-600"></i>
+                    <h1 class="text-2xl font-bold text-gray-800">TeleMed</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div id="user-info" class="hidden items-center space-x-2">
+                        <span id="user-name" class="text-gray-700"></span>
+                        <span id="user-role" class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800"></span>
+                        <button onclick="logout()" class="text-red-600 hover:text-red-800">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                    <div id="auth-buttons" class="flex space-x-2">
+                        <button onclick="showLogin()" class="px-4 py-2 text-blue-600 hover:text-blue-800">Login</button>
+                        <button onclick="showRegister()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Register</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Landing Page -->
+        <div id="landing-page" class="text-center">
+            <div class="mb-12">
+                <h2 class="text-5xl font-bold text-gray-800 mb-4">Healthcare Made Simple</h2>
+                <p class="text-xl text-gray-600 mb-8">Connect with healthcare professionals from the comfort of your home</p>
+                <div class="flex justify-center space-x-4">
+                    <button onclick="showRegister()" class="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        Get Started
+                    </button>
+                    <button onclick="showSampleData()" class="px-8 py-3 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors">
+                        View Sample Data
+                    </button>
+                </div>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8 mb-12">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <i class="fas fa-calendar-alt text-3xl text-blue-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Easy Scheduling</h3>
+                    <p class="text-gray-600">Book appointments with healthcare providers instantly</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <i class="fas fa-video text-3xl text-green-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Secure Communication</h3>
+                    <p class="text-gray-600">Chat securely with your healthcare team</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <i class="fas fa-shield-alt text-3xl text-purple-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">FHIR Compliant</h3>
+                    <p class="text-gray-600">Industry-standard healthcare data management</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login Modal -->
+        <div id="login-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white p-8 rounded-lg shadow-xl max-w-md w-full mx-4">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800">Login</h3>
+                    <button onclick="hideModals()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form id="login-form" onsubmit="login(event)">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                        <input type="email" name="email" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                        <input type="password" name="password" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        Login
+                    </button>
+                    <p class="mt-4 text-sm text-gray-600">
+                        
+                    </p>
+                </form>
+            </div>
+        </div>
+
+        <!-- Register Modal -->
+        <div id="register-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white p-8 rounded-lg shadow-xl max-w-md w-full mx-4">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800">Register</h3>
+                    <button onclick="hideModals()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form id="register-form" onsubmit="register(event)">
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">First Name</label>
+                            <input type="text" name="first_name" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Last Name</label>
+                            <input type="text" name="last_name" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                        <input type="email" name="email" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                        <input type="password" name="password" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Role</label>
+                        <select name="role" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                            <option value="">Select Role</option>
+                            <option value="patient">Patient</option>
+                            <option value="doctor">Doctor</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Gender</label>
+                        <div class="flex gap-4">
+                            <label class="flex items-center">
+                                <input type="radio" name="gender" value="male" class="mr-2">
+                                <span class="text-gray-700">Male</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="gender" value="female" class="mr-2">
+                                <span class="text-gray-700">Female</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="gender" value="other" class="mr-2">
+                                <span class="text-gray-700">Other</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Phone (Optional)</label>
+                        <input type="tel" name="phone" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        Register
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboard" class="hidden">
+            <div class="flex flex-wrap -mx-2 mb-8">
+                <div class="w-full lg:w-1/3 px-2 mb-4">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-user text-blue-600 mr-2"></i>
+                            Profile
+                        </h3>
+                        <div id="user-profile"></div>
+                    </div>
+                </div>
+                <div class="w-full lg:w-2/3 px-2 mb-4">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-calendar text-green-600 mr-2"></i>
+                            Recent Appointments
+                        </h3>
+                        <div id="recent-appointments"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <div class="mb-6">
+                <div class="border-b border-gray-200">
+                    <nav class="-mb-px flex space-x-8">
+                        <button onclick="showTab('appointments')" class="tab-btn py-2 px-1 border-b-2 font-medium text-sm" data-tab="appointments">
+                            <i class="fas fa-calendar-alt mr-2"></i>Appointments
+                        </button>
+                        <button onclick="showTab('messages')" class="tab-btn py-2 px-1 border-b-2 font-medium text-sm" data-tab="messages">
+                            <i class="fas fa-comments mr-2"></i>Messages
+                        </button>
+                        <button onclick="showTab('patients')" class="tab-btn py-2 px-1 border-b-2 font-medium text-sm hidden" data-tab="patients" id="patients-tab">
+                            <i class="fas fa-users mr-2"></i>Patients
+                        </button>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Tab Content -->
+            <div id="appointments-tab" class="tab-content">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold">My Appointments</h3>
+                        <button onclick="showBookAppointment()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="book-appointment-btn">
+                            <i class="fas fa-plus mr-2"></i>Book Appointment
+                        </button>
+                    </div>
+                    <div id="appointments-list"></div>
+                </div>
+            </div>
+
+            <div id="messages-tab" class="tab-content hidden">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold mb-4">Messages</h3>
+                    <div id="messages-list"></div>
+                </div>
+            </div>
+
+            <div id="patients-tab-content" class="tab-content hidden">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold mb-4">My Patients (FHIR Format)</h3>
+                    <div id="patients-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Book Appointment Modal -->
+        <div id="book-appointment-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white p-8 rounded-lg shadow-xl max-w-md w-full mx-4">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800">Book Appointment</h3>
+                    <button onclick="hideModals()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form id="appointment-form" onsubmit="bookAppointment(event)">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Date & Time</label>
+                        <input type="datetime-local" name="start_time" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Reason for Visit</label>
+                        <textarea name="reason" rows="3" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" placeholder="Describe your symptoms or reason for consultation"></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        Book Appointment
+                    </button>
+                </form>
+            </div>
+        </div>
+
+      <!-- FHIR Data Modal - REPLACE YOUR EXISTING MODAL WITH THIS -->
+<div id="sample-data-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-xl shadow-2xl max-w-6xl w-full max-h-[90vh] flex flex-col">
+        <!-- Modal Header -->
+        <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-t-xl flex justify-between items-center">
+            <div>
+                <h3 class="text-2xl font-bold">Sample FHIR Data</h3>
+                <p class="text-blue-100">Fast Healthcare Interoperability Resources</p>
+            </div>
+            <button onclick="hideModals()" class="text-white hover:text-gray-200 text-2xl transition-colors">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <!-- Modal Content -->
+        <div class="flex-1 overflow-hidden flex flex-col">
+            <!-- Tabs -->
+            <div class="border-b border-gray-200 bg-gray-50 px-6">
+                <nav class="flex space-x-8">
+                    <button onclick="switchFHIRTab('patient')" id="patient-tab-btn" class="fhir-tab active py-4 px-2 border-b-2 border-blue-500 text-blue-600 font-medium">
+                        <i class="fas fa-user mr-2"></i>Patient
+                    </button>
+                    <button onclick="switchFHIRTab('observation')" id="observation-tab-btn" class="fhir-tab py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium">
+                        <i class="fas fa-chart-line mr-2"></i>Observation
+                    </button>
+                    <button onclick="switchFHIRTab('appointment')" id="appointment-tab-btn" class="fhir-tab py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium">
+                        <i class="fas fa-calendar mr-2"></i>Appointment
+                    </button>
+                </nav>
+            </div>
+            
+            <!-- Tab Content -->
+            <div class="flex-1 overflow-y-auto p-6">
+                <!-- Patient Tab -->
+                <div id="patient-fhir-content" class="fhir-content">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                        <h4 class="text-lg font-semibold text-blue-800 mb-2">
+                            <i class="fas fa-info-circle mr-2"></i>Patient Resource
+                        </h4>
+                        <p class="text-blue-700">Contains demographic and administrative information about a person receiving healthcare services.</p>
+                    </div>
+                    <div class="bg-gray-900 rounded-lg p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-green-400 font-mono text-sm">patient-resource.json</span>
+                            <button onclick="copyFHIRData('sample-patient-data')" class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded text-xs transition-colors">
+                                <i class="fas fa-copy mr-1"></i>Copy
+                            </button>
+                        </div>
+                        <pre class="text-sm text-gray-300 overflow-x-auto" id="sample-patient-data">{
+  "resourceType": "Patient",
+  "id": "patient-001",
+  "active": true,
+  "name": [
+    {
+      "use": "official",
+      "family": "{{ patient_name.split()[1] if patient_name else 'Doe' }}",
+      "given": ["{{ patient_name.split()[0] if patient_name else 'John' }}", "Michael"]
+    }
+  ],
+  "telecom": [
+    {
+      "system": "phone",
+      "value": "{{ patient_phone if patient_phone else '+1-555-123-4567' }}",
+      "use": "home"
+    },
+    {
+      "system": "email",
+      "value": "{{ patient_email if patient_email else 'john.doe@email.com' }}"
+    }
+  ],
+  "gender": "{{ patient_gender.lower() if patient_gender else 'male' }}",
+  "birthDate": "{{ patient_birthdate if patient_birthdate else '1985-03-15' }}",
+  "address": [
+    {
+      "use": "home",
+      "type": "both",
+      "line": ["123 Main Street", "Apt 4B"],
+      "city": "Springfield",
+      "state": "IL",
+      "postalCode": "62701",
+      "country": "US"
+    }
+  ],
+  "maritalStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus",
+        "code": "M",
+        "display": "Married"
+      }
+    ]
+  }
+}</pre>
+                    </div>
+                </div>
+
+                <!-- Observation Tab -->
+                <div id="observation-fhir-content" class="fhir-content hidden">
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                        <h4 class="text-lg font-semibold text-green-800 mb-2">
+                            <i class="fas fa-chart-line mr-2"></i>Observation Resource
+                        </h4>
+                        <p class="text-green-700">Contains measurements, lab results, vital signs, and other clinical observations.</p>
+                    </div>
+                    <div class="bg-gray-900 rounded-lg p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-green-400 font-mono text-sm">blood-pressure-observation.json</span>
+                            <button onclick="copyFHIRData('sample-observation-data')" class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded text-xs transition-colors">
+                                <i class="fas fa-copy mr-1"></i>Copy
+                            </button>
+                        </div>
+                        <pre class="text-sm text-gray-300 overflow-x-auto" id="sample-observation-data">{
+  "resourceType": "Observation",
+  "id": "bp-001",
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+          "code": "vital-signs",
+          "display": "Vital Signs"
+        }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "85354-9",
+        "display": "Blood pressure panel"
+      }
+    ],
+    "text": "Blood Pressure"
+  },
+  "subject": {
+    "reference": "Patient/patient-001"
+  },
+  "effectiveDateTime": "{{ current_datetime }}",
+  "performer": [
+    {
+      "reference": "Practitioner/{{ doctor_id if doctor_id else 'dr-smith' }}"
+    }
+  ],
+  "component": [
+    {
+      "code": {
+        "coding": [
+          {
+            "system": "http://loinc.org",
+            "code": "8480-6",
+            "display": "Systolic blood pressure"
+          }
+        ]
+      },
+      "valueQuantity": {
+        "value": {{ systolic_bp if systolic_bp else 120 }},
+        "unit": "mmHg",
+        "system": "http://unitsofmeasure.org",
+        "code": "mm[Hg]"
+      }
+    },
+    {
+      "code": {
+        "coding": [
+          {
+            "system": "http://loinc.org",
+            "code": "8462-4",
+            "display": "Diastolic blood pressure"
+          }
+        ]
+      },
+      "valueQuantity": {
+        "value": {{ diastolic_bp if diastolic_bp else 80 }},
+        "unit": "mmHg",
+        "system": "http://unitsofmeasure.org",
+        "code": "mm[Hg]"
+      }
+    }
+  ]
+}</pre>
+                    </div>
+                </div>
+
+                <!-- Appointment Tab -->
+                <div id="appointment-fhir-content" class="fhir-content hidden">
+                    <div class="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-6">
+                        <h4 class="text-lg font-semibold text-purple-800 mb-2">
+                            <i class="fas fa-calendar mr-2"></i>Appointment Resource
+                        </h4>
+                        <p class="text-purple-700">Contains scheduling information for healthcare appointments.</p>
+                    </div>
+                    <div class="bg-gray-900 rounded-lg p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-green-400 font-mono text-sm">appointment-resource.json</span>
+                            <button onclick="copyFHIRData('sample-appointment-data')" class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded text-xs transition-colors">
+                                <i class="fas fa-copy mr-1"></i>Copy
+                            </button>
+                        </div>
+                        <pre class="text-sm text-gray-300 overflow-x-auto" id="sample-appointment-data">{
+  "resourceType": "Appointment",
+  "id": "apt-001",
+  "status": "{{ appointment_status if appointment_status else 'booked' }}",
+  "serviceCategory": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/service-category",
+          "code": "17",
+          "display": "General Practice"
+        }
+      ]
+    }
+  ],
+  "appointmentType": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/v2-0276",
+        "code": "ROUTINE",
+        "display": "Routine appointment"
+      }
+    ]
+  },
+  "description": "{{ appointment_description if appointment_description else 'Follow-up consultation' }}",
+  "start": "{{ appointment_start if appointment_start else '2024-06-25T09:00:00Z' }}",
+  "end": "{{ appointment_end if appointment_end else '2024-06-25T09:30:00Z' }}",
+  "minutesDuration": 30,
+  "participant": [
+    {
+      "actor": {
+        "reference": "Patient/patient-001"
+      },
+      "required": "required",
+      "status": "accepted"
+    },
+    {
+      "actor": {
+        "reference": "Practitioner/{{ doctor_id if doctor_id else 'dr-smith' }}"
+      },
+      "required": "required",
+      "status": "accepted"
+    }
+  ]
+}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Footer -->
+        <div class="bg-gray-50 px-6 py-4 rounded-b-xl border-t border-gray-200">
+            <div class="flex justify-between items-center">
+                <div class="text-sm text-gray-600">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    FHIR R4 Standard - Healthcare Data Interoperability
+                </div>
+                <button onclick="hideModals()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <!-- Chat Modal -->
+        <div id="chat-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] flex flex-col">
+                <div class="flex justify-between items-center p-4 border-b">
+                    <h3 class="text-lg font-semibold" id="chat-title">Chat</h3>
+                    <button onclick="hideModals()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="flex-1 overflow-y-auto p-4" id="chat-messages" style="max-height: 400px;">
+                    <!-- Messages will be loaded here -->
+                </div>
+                <div class="p-4 border-t">
+                    <form id="message-form" onsubmit="sendMessage(event)" class="flex space-x-2">
+                        <input type="text" name="content" required placeholder="Type your message..." class="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                        <input type="hidden" name="recipient_id" id="chat-recipient-id">
+                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentUser = null;
+        let authToken = null;
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is already logged in
+            const token = localStorage.getItem('authToken');
+            const user = localStorage.getItem('currentUser');
+            
+            if (token && user) {
+                authToken = token;
+                currentUser = JSON.parse(user);
+                showDashboard();
+            }
+        });
+
+        // Authentication functions
+        async function login(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData);
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    authToken = result.access_token;
+                    currentUser = result.user;
+                    localStorage.setItem('authToken', authToken);
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    
+                    hideModals();
+                    showDashboard();
+                    showNotification('Login successful!', 'success');
+                } else {
+                    showNotification(result.error || 'Login failed', 'error');
+                }
+            } catch (error) {
+                showNotification('Network error. Please try again.', 'error');
+            }
+        }
+
+        async function register(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData);
+
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showNotification('Registration successful! Please login.', 'success');
+                    hideModals();
+                    showLogin();
+                } else {
+                    showNotification(result.error || 'Registration failed', 'error');
+                }
+            } catch (error) {
+                showNotification('Network error. Please try again.', 'error');
+            }
+        }
+
+        function logout() {
+            authToken = null;
+            currentUser = null;
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('currentUser');
+            
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('landing-page').classList.remove('hidden');
+            document.getElementById('user-info').classList.add('hidden');
+            document.getElementById('auth-buttons').classList.remove('hidden');
+            
+            showNotification('Logged out successfully', 'success');
+        }
+
+        // UI functions
+        function showLogin() {
+            document.getElementById('login-modal').classList.remove('hidden');
+        }
+
+        function showRegister() {
+            document.getElementById('register-modal').classList.remove('hidden');
+        }
+
+        function hideModals() {
+            document.querySelectorAll('.fixed').forEach(modal => {
+                modal.classList.add('hidden');
+            });
+        }
+
+        async function showDashboard() {
+            document.getElementById('landing-page').classList.add('hidden');
+            document.getElementById('auth-buttons').classList.add('hidden');
+            document.getElementById('user-info').classList.remove('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+
+            // Update user info in nav
+            document.getElementById('user-name').textContent = `${currentUser.first_name} ${currentUser.last_name}`;
+            document.getElementById('user-role').textContent = currentUser.role.toUpperCase();
+
+            // Show/hide role-specific elements
+            if (currentUser.role === 'doctor') {
+                document.getElementById('patients-tab').classList.remove('hidden');
+                document.getElementById('book-appointment-btn').classList.add('hidden');
+            }
+
+            await loadDashboardData();
+            showTab('appointments');
+        }
+
+        async function loadDashboardData() {
+            try {
+                const response = await fetch('/api/dashboard', {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    updateUserProfile(data.user);
+                    updateRecentAppointments(data.appointments);
+                } else {
+                    showNotification('Failed to load dashboard data', 'error');
+                }
+            } catch (error) {
+                showNotification('Network error loading dashboard', 'error');
+            }
+        }
+
+        function updateUserProfile(user) {
+            const profileDiv = document.getElementById('user-profile');
+            if (user.resourceType === 'Patient') {
+                // FHIR Patient format
+                profileDiv.innerHTML = `
+                    <div class="space-y-2">
+                        <p><strong>ID:</strong> ${user.id}</p>
+                        <p><strong>Name:</strong> ${user.name[0].given[0]} ${user.name[0].family}</p>
+                        <p><strong>Email:</strong> ${user.telecom[0].value}</p>
+                        <p><strong>Gender:</strong> ${user.gender}</p>
+                        ${user.birthDate ? `<p><strong>Birth Date:</strong> ${user.birthDate}</p>` : ''}
+                        ${user.address[0] ? `<p><strong>Address:</strong> ${user.address[0].text}</p>` : ''}
+                    </div>
+                `;
+            } else {
+                // Doctor format
+                profileDiv.innerHTML = `
+                    <div class="space-y-2">
+                        <p><strong>Name:</strong> ${user.name}</p>
+                        <p><strong>Role:</strong> ${user.role}</p>
+                        <p><strong>Email:</strong> ${user.email}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function updateRecentAppointments(appointments) {
+            const container = document.getElementById('recent-appointments');
+            if (appointments.length === 0) {
+                container.innerHTML = '<p class="text-gray-500">No recent appointments</p>';
+                return;
+            }
+
+            container.innerHTML = appointments.slice(0, 3).map(apt => `
+                <div class="border-l-4 border-blue-500 pl-4 py-2 mb-3">
+                    <p class="font-medium">${new Date(apt.start).toLocaleDateString()} at ${new Date(apt.start).toLocaleTimeString()}</p>
+                    <p class="text-sm text-gray-600">Status: ${apt.status}</p>
+                    ${apt.reasonCode[0] ? `<p class="text-sm text-gray-600">${apt.reasonCode[0].text}</p>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function showTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('border-blue-500', 'text-blue-600');
+                btn.classList.add('border-transparent', 'text-gray-500');
+            });
+            
+            document.querySelector(`[data-tab="${tabName}"]`).classList.remove('border-transparent', 'text-gray-500');
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('border-blue-500', 'text-blue-600');
+
+            // Show/hide tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            if (tabName === 'patients') {
+                document.getElementById('patients-tab-content').classList.remove('hidden');
+                loadPatients();
+            } else {
+                document.getElementById(`${tabName}-tab`).classList.remove('hidden');
+            }
+
+            if (tabName === 'appointments') {
+                loadAppointments();
+            } else if (tabName === 'messages') {
+                loadMessages();
+            }
+        }
+
+        async function loadAppointments() {
+            try {
+                const response = await fetch('/api/appointments', {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (response.ok) {
+                    const appointments = await response.json();
+                    displayAppointments(appointments);
+                }
+            } catch (error) {
+                showNotification('Error loading appointments', 'error');
+            }
+        }
+
+        function displayAppointments(appointments) {
+            const container = document.getElementById('appointments-list');
+            
+            if (appointments.length === 0) {
+                container.innerHTML = '<p class="text-gray-500">No appointments scheduled</p>';
+                return;
+            }
+
+            container.innerHTML = appointments.map(apt => `
+                <div class="border rounded-lg p-4 mb-4 hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-semibold text-lg">${new Date(apt.start).toLocaleDateString()}</h4>
+                            <p class="text-gray-600">${new Date(apt.start).toLocaleTimeString()} - ${new Date(apt.end).toLocaleTimeString()}</p>
+                            <p class="text-sm mt-2"><span class="px-2 py-1 bg-${apt.status === 'scheduled' ? 'blue' : apt.status === 'completed' ? 'green' : 'red'}-100 text-${apt.status === 'scheduled' ? 'blue' : apt.status === 'completed' ? 'green' : 'red'}-800 rounded-full">${apt.status}</span></p>
+                            ${apt.reasonCode[0] ? `<p class="text-gray-700 mt-2">${apt.reasonCode[0].text}</p>` : ''}
+                        </div>
+                        <div class="flex space-x-2">
+                            ${currentUser.role === 'patient' ? 
+                                `<button onclick="openChat('${apt.participant[1].actor.reference.split('/')[1]}')" class="text-blue-600 hover:text-blue-800">
+                                    <i class="fas fa-comments"></i>
+                                </button>` :
+                                `<button onclick="openChat('${apt.participant[0].actor.reference.split('/')[1]}')" class="text-blue-600 hover:text-blue-800">
+                                    <i class="fas fa-comments"></i>
+                                </button>`
+                            }
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadPatients() {
+            if (currentUser.role !== 'doctor') return;
+
+            try {
+                const response = await fetch('/api/patients', {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (response.ok) {
+                    const patients = await response.json();
+                    displayPatients(patients);
+                }
+            } catch (error) {
+                showNotification('Error loading patients', 'error');
+            }
+        }
+
+        function displayPatients(patients) {
+            const container = document.getElementById('patients-list');
+            
+            if (patients.length === 0) {
+                container.innerHTML = '<p class="text-gray-500">No patients found</p>';
+                return;
+            }
+
+            container.innerHTML = patients.map(patient => `
+                <div class="border rounded-lg p-4 mb-4">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-lg">${patient.name[0].given[0]} ${patient.name[0].family}</h4>
+                            <div class="mt-2 text-sm space-y-1">
+                                <p><strong>Patient ID:</strong> ${patient.id}</p>
+                                <p><strong>Identifier:</strong> ${patient.identifier[0].value}</p>
+                                <p><strong>Email:</strong> ${patient.telecom[0].value}</p>
+                                <p><strong>Gender:</strong> ${patient.gender}</p>
+                                ${patient.birthDate ? `<p><strong>Birth Date:</strong> ${patient.birthDate}</p>` : ''}
+                                ${patient.address[0] ? `<p><strong>Address:</strong> ${patient.address[0].text}</p>` : ''}
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <button onclick="openChat('${patient.id}')" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+                                <i class="fas fa-comments mr-1"></i>Chat
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-3 p-3 bg-gray-50 rounded text-xs">
+                        <strong>FHIR Resource Type:</strong> ${patient.resourceType}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadMessages() {
+            try {
+                const response = await fetch('/api/messages', {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (response.ok) {
+                    const messages = await response.json();
+                    displayMessages(messages);
+                }
+            } catch (error) {
+                showNotification('Error loading messages', 'error');
+            }
+        }
+
+        function displayMessages(messages) {
+            const container = document.getElementById('messages-list');
+            
+            if (messages.length === 0) {
+                container.innerHTML = '<p class="text-gray-500">No messages</p>';
+                return;
+            }
+
+            // Group messages by conversation
+            const conversations = {};
+            messages.forEach(msg => {
+                const otherUserId = msg.sender_id === currentUser.id ? msg.recipient_id : msg.sender_id;
+                const otherUserName = msg.sender_id === currentUser.id ? msg.recipient_name : msg.sender_name;
+                
+                if (!conversations[otherUserId]) {
+                    conversations[otherUserId] = {
+                        userId: otherUserId,
+                        userName: otherUserName,
+                        lastMessage: msg,
+                        unreadCount: 0
+                    };
+                }
+                
+                if (msg.recipient_id === currentUser.id && !msg.read) {
+                    conversations[otherUserId].unreadCount++;
+                }
+            });
+
+            container.innerHTML = Object.values(conversations).map(conv => `
+                <div class="border rounded-lg p-4 mb-3 cursor-pointer hover:shadow-md transition-shadow" onclick="openChat('${conv.userId}')">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h4 class="font-semibold">${conv.userName}</h4>
+                            <p class="text-gray-600 text-sm truncate">${conv.lastMessage.content}</p>
+                            <p class="text-xs text-gray-500">${new Date(conv.lastMessage.timestamp).toLocaleString()}</p>
+                        </div>
+                        ${conv.unreadCount > 0 ? `<span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">${conv.unreadCount}</span>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showBookAppointment() {
+            document.getElementById('book-appointment-modal').classList.remove('hidden');
+        }
+
+        async function bookAppointment(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData);
+
+            try {
+                const response = await fetch('/api/appointments', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    showNotification('Appointment booked successfully!', 'success');
+                    hideModals();
+                    loadAppointments();
+                    loadDashboardData();
+                } else {
+                    const result = await response.json();
+                    showNotification(result.error || 'Failed to book appointment', 'error');
+                }
+            } catch (error) {
+                showNotification('Network error. Please try again.', 'error');
+            }
+        }
+
+        async function openChat(userId) {
+            document.getElementById('chat-recipient-id').value = userId;
+            document.getElementById('chat-modal').classList.remove('hidden');
+            
+            // Load conversation
+            try {
+                const response = await fetch(`/api/messages?with=${userId}`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (response.ok) {
+                    const messages = await response.json();
+                    displayChatMessages(messages);
+                    
+                    if (messages.length > 0) {
+                        const otherUser = messages[0].sender_id === currentUser.id ? messages[0].recipient_name : messages[0].sender_name;
+                        document.getElementById('chat-title').textContent = `Chat with ${otherUser}`;
+                    }
+                }
+            } catch (error) {
+                showNotification('Error loading chat', 'error');
+            }
+        }
+
+        function displayChatMessages(messages) {
+            const container = document.getElementById('chat-messages');
+            
+            container.innerHTML = messages.map(msg => `
+                <div class="mb-4 ${msg.sender_id === currentUser.id ? 'text-right' : 'text-left'}">
+                    <div class="inline-block max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${msg.sender_id === currentUser.id ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}">
+                        <p>${msg.content}</p>
+                        <p class="text-xs mt-1 ${msg.sender_id === currentUser.id ? 'text-blue-100' : 'text-gray-500'}">
+                            ${new Date(msg.timestamp).toLocaleTimeString()}
+                        </p>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function sendMessage(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData);
+
+            try {
+                const response = await fetch('/api/messages', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    event.target.reset();
+                    // Reload chat messages
+                    openChat(data.recipient_id);
+                } else {
+                    showNotification('Failed to send message', 'error');
+                }
+            } catch (error) {
+                showNotification('Network error', 'error');
+            }
+        }
+
+        async function showSampleData() {
+            try {
+                const response = await fetch('/api/sample-data');
+                const data = await response.json();
+                
+                document.getElementById('sample-patient-data').textContent = JSON.stringify(data.patient, null, 2);
+                document.getElementById('sample-observation-data').textContent = JSON.stringify(data.observations[0], null, 2);
+                document.getElementById('sample-data-modal').classList.remove('hidden');
+            } catch (error) {
+                showNotification('Error loading sample data', 'error');
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+
+        
+    </script>
+</body>
+</html>
